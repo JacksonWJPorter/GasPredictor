@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gas Price Decision Support System</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+
+<body>
+    <h1>Gas Price Decision Support System</h1>
+    <form method="post">
+        <label for="current_miles">Current Miles until Empty:</label>
+        <input type="number" id="current_miles" name="current_miles" required>
+        <br>
+        <label for="consumption_rate">Consumption Rate (miles/gallon):</label>
+        <input type="number" id="consumption_rate" name="consumption_rate" required>
+        <br>
+        <button type="submit">Submit</button>
+    </form>
+
+    {% if decision %}
+    <h2>Decision: {{ decision }}</h2>
+    {% endif %}
+
+    {% if graphJSON %}
+    <div id="chart"></div>
+    <script>
+        var graphJSON = {{ graphJSON | safe }};
+        Plotly.newPlot('chart', graphJSON.data, graphJSON.layout);
+    </script>
+    {% endif %}
+</body>
+
+</html>
