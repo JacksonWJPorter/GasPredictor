@@ -5,32 +5,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gas Price Decision Support System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        #chart {
+            height: 500px;
+        }
+
+        #loading-spinner {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Gas Price Decision Support System</h1>
-    <form method="post">
-        <label for="current_miles">Current Miles until Empty:</label>
-        <input type="number" id="current_miles" name="current_miles" required>
+    <div class="container">
+        <h1 class="center-align">Gas Price Decision Support System</h1>
+        <form id="gasForm" method="post">
+            <div class="input-field">
+                <input type="number" id="current_miles" name="current_miles" value="{{ request.form.current_miles }}"
+                    required>
+                <label for="current_miles" class="active">Current Miles until Empty</label>
+            </div>
+            <div class="input-field">
+                <input type="number" id="daily_driving_distance" name="daily_driving_distance"
+                    value="{{ request.form.daily_driving_distance }}" required>
+                <label for="daily_driving_distance" class="active">Daily Driving Distance (miles)</label>
+            </div>
+            <button type="submit" class="btn waves-effect waves-light">Submit</button>
+        </form>
         <br>
-        <label for="consumption_rate">Consumption Rate (miles/gallon):</label>
-        <input type="number" id="consumption_rate" name="consumption_rate" required>
-        <br>
-        <button type="submit">Submit</button>
-    </form>
+        <div id="loading-spinner" class="preloader-wrapper big active">
+            <div class="spinner-layer spinner-red">
+                <div class="circle-clipper left">
+                    <div class="circle"></div>
+                </div>
+                <div class="gap-patch">
+                    <div class="circle"></div>
+                </div>
+                <div class="circle-clipper right">
+                    <div class="circle"></div>
+                </div>
+            </div>
+        </div>
 
-    {% if decision %}
-    <h2>Decision: {{ decision }}</h2>
-    {% endif %}
+        {% if decision %}
+        <h5 class="center-align">Decision: {{ decision }}</h5>
+        {% endif %}
 
-    {% if graphJSON %}
-    <div id="chart"></div>
+        {% if graphJSON %}
+        <div id="chart" class="section"></div>
+        <script>
+            var graphJSON = {{ graphJSON | safe }};
+            if (graphJSON && document.getElementById('chart')) {
+                Plotly.newPlot('chart', graphJSON.data, graphJSON.layout, { responsive: true });
+            }
+        </script>
+        {% endif %}
+    </div>
+
     <script>
-        var graphJSON = {{ graphJSON | safe }};
-        Plotly.newPlot('chart', graphJSON.data, graphJSON.layout);
+        document.getElementById('gasForm').onsubmit = function () {
+            document.getElementById('loading-spinner').style.display = 'block';
+        };
     </script>
-    {% endif %}
 </body>
 
 </html>
